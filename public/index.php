@@ -1,4 +1,5 @@
 <?php
+echo '<center><h1>WELCOME TO MT-PING</h1></center>';return;
 ini_set("display_errors", 1);
 
 //Root path
