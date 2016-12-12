@@ -23,7 +23,7 @@ class Test
         $arrParam = [];
         try {
             $arr_channel = [
-
+                'UCj6B4cj9mB9JXWW65T4Sh4w'
             ];
 
             $google_config = \My\General::$google_config;
@@ -32,11 +32,10 @@ class Test
 
             // Define an object that will be used to make all API requests.
             $youtube = new \Google_Service_YouTube($client);
-            $total = count($arr_channel);
             for ($i = 0; $i <= $total; $i++) {
                 $token_page = null;
                 for ($page = 0; $page <= 1000; $page++) {
-                    if ($i == 0) {
+                    if ($page == 0) {
                         $searchResponse = $youtube->search->listSearch(
                             'snippet', array(
                                 'channelId' => $arr_channel[$i],
@@ -68,6 +67,7 @@ class Test
                         }
                         $id = $item->getId()->getVideoId();
 
+
                         if (empty($id)) {
                             continue;
                         }
@@ -85,11 +85,11 @@ class Test
                         }
 
                         //Limit request token in day: time, count
-//                        $status = $redis->SET($id, General::getSlug($title));
-//
-//                        if (!$status) {
-//                            continue;
-//                        }
+                        $status = $redis->SET($id, General::getSlug($title));
+
+                        if (!$status) {
+                            continue;
+                        }
 
                         //get info video
                         $url = 'http://www.youtube.com/get_video_info?&video_id=' . $id . '&asv=3&el=detailpage&hl=en_US';
@@ -101,6 +101,8 @@ class Test
                         if (empty($url_encoded_fmt_stream_map)) {
                             continue;
                         }
+
+                        $path = '/var/ydownload/' . General::getSlug($title) . '_' . $id . '.mp4 "';
 
                         $avail_formats[] = '';
                         $j = 0;
@@ -117,22 +119,19 @@ class Test
                             $avail_formats[$j]['expires'] = date("G:i:s T", $expire);
                             $avail_formats[$j]['ipbits'] = $ipbits;
                             $avail_formats[$j]['ip'] = $ip;
-                            $i++;
+                            $j++;
                         }
+                        echo '<pre>';
+                        print_r($avail_formats);
+                        die();
+                        exec('wget -O ' . $path . $avail_formats[0]['url'] . '"');
 
-                        exec('wget -O ' . General::getSlug($title) . '_' . $id . '.mp4 ' . $avail_formats[0]['url']);
-                        $info = $avail_formats[0];
+                        echo '123123';
+                        die();
 
                     }
                 }
             }
-
-
-            echo '<pre>';
-            print_r($searchResponse);
-            echo '</pre>';
-            die();
-
             Utils::writeLog($fileNameSuccess, $arrParam);
         } catch
         (\Exception $e) {
@@ -140,78 +139,81 @@ class Test
         }
     }
 
-    public function refreshAudience($params)
+    public function uploadYt($params)
     {
         date_default_timezone_set('Asia/Saigon');
-        $fileNameSuccess = "Worker_Admin_Refresh_Audience_Success";
-        $fileNameError = "Worker_Admin_Refresh_Audience_Error";
-        $arrParam = [];
+        $fileNameSuccess = __CLASS__ . '_' . __FUNCTION__ . '_Success';
+        $fileNameError = __CLASS__ . '_' . __FUNCTION__ . '_Success';
+        $arrParam = [
+            'params_input' => $params
+        ];
         try {
-            $arrParam['Param'] = array(
-                'time_interval' => $params['time_interval']
+            $google_config = General::$google_config;
+            $client = new \Google_Client();
+            $client->setDeveloperKey($google_config['key']);
+
+            $videoPath = $params['video_path'];
+
+            // Define an object that will be used to make all API requests.
+            $youtube = new \Google_Service_YouTube($client);
+            $snippet = new \Google_Service_YouTube_VideoSnippet();
+            $snippet->setTitle($params['title']);
+            $snippet->setDescription($params['description']);
+            $snippet->setTags(array("tag1", "tag2"));
+            $snippet->setCategoryId("22");
+
+            //status
+            $status = new \Google_Service_YouTube_VideoStatus();
+            $status->privacyStatus = "public";
+
+            //videos
+            $video = new \Google_Service_YouTube_Video();
+            $video->setSnippet($snippet);
+            $video->setStatus($status);
+
+            $chunkSizeBytes = 1 * 1024 * 1024;
+            $client->setDefer(true);
+
+            $insertRequest = $youtube->videos->insert("status,snippet", $video);
+
+            // Create a MediaFileUpload object for resumable uploads.
+            $media = new \Google_Http_MediaFileUpload(
+                $client,
+                $insertRequest,
+                'video/*',
+                null,
+                true,
+                $chunkSizeBytes
             );
-            $all_network = Utils::autoReconnectionProcess(
-                '\ADX\DAO\Job',
-                'getAllNetWork',
-                array(),
-                $fileNameError
-            );
-            if ($all_network['error'] == 0 || empty($all_network['rows'])) {
-                $arrParam['DB']['Message'] = 'Can not find any network';
-                $arrParam['DB']['Error'] = $all_network;
-                Utils::errorMessenger(__CLASS__, __FUNCTION__, __LINE__, $arrParam, $fileNameError);
-                return;
+            $media->setFileSize(filesize($videoPath));
+
+            $status = false;
+            $handle = fopen($videoPath, "rb");
+            while (!$status && !feof($handle)) {
+                $chunk = fread($handle, $chunkSizeBytes);
+                $status = $media->nextChunk($chunk);
             }
-            foreach ($all_network['rows'] as $item) {
-                $list_audience_running = Utils::autoReconnectionProcess(
-                    '\ADX\DAO\Job',
-                    'getAllAudienceRunning',
-                    array(
-                        'network_id' => $item['NETWORK_ID']
-                    )
-                );
-                if ($list_audience_running['error'] == 0 || empty($list_audience_running['rows'])) {
-                    $arrParam['DB']['Message'] = 'Can not get audience running of network ' . $item['NETWORK_ID'];
-                    $arrParam['DB']['Error'] = $all_network;
-                    Utils::errorMessenger(__CLASS__, __FUNCTION__, __LINE__, $arrParam, $fileNameError);
-                } else {
-                    unset($arrParam['DB']);
-                    $total_refreshed = 0;
-                    foreach ($list_audience_running['rows'] as $audience) {
-                        $conversion_id = $audience['CONVERSION_ID'];
-                        $audience_id = $audience['AUDIENCE_ID'];
-                        $arrParam['AUDIENCE_UPDATED'][$item['NETWORK_ID']][$conversion_id][] = $audience_id;
 
-                        $data = array(
-                            'objId' => '',
-                            'actorId' => '',
-                            'actorType' => 'job_adx',
-                            'data' => array(
-                                'conversion_id' => $conversion_id,
-                                'audience_id' => array($audience_id)
-                            ),
-                            'fromComponent' => 'back-end'
-                        );
+            fclose($handle);
 
-                        $location_name = isset($audience['COUNTRY_CODE']) ? $audience['COUNTRY_CODE'] : '';
-                        //
-                        PubSub::publish('pubsub_audience', 'audience', 'refresh', $data, $location_name);
-                        //
-                        PubSub::publish('pubsub_audiencev2', 'audience', 'refresh', $data, $location_name);
+            // If you want to make other calls after the file upload, set setDefer back to false
+            $client->setDefer(false);
 
-                        $total_refreshed += 1;
+            echo '<pre>';
+            print_r($status);
+            echo '</pre>';
+            die();
 
-                    }
-                    $arrParam['Audience_Updated'][] = array(
-                        'network_id' => $item['NETWORK_ID'],
-                        'total_updated' => $total_refreshed
-                    );
-                }
-
-            }
             Utils::writeLog($fileNameSuccess, $arrParam);
         } catch (\Exception $e) {
-            throw new Exception($e->getMessage(), $e->getCode());
+            echo '<pre>';
+            print_r([
+                'code' => $e->getCode(),
+                'messages' => $e->getMessage()
+            ]);
+            echo '</pre>';
+            die();
+            Utils::writeLog($fileNameError, $arrParam);
         }
     }
 }
