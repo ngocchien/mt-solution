@@ -14,25 +14,11 @@
 return array(
     'redis' => array(
         'adapters' => array(
-            'info_buyer' => array(
-                'prefix' => 'adx_v3',
-                'component' => 'font-end',
-                'host' => '10.199.0.3',
-                'port' => '6501',
-                'timeout' => '0'
-            ),
-            'info_adx' => array(
-                'prefix' => 'adx_v1',
-                'component' => 'font-end',
-                'host' => '10.199.0.3',
-                'port' => '6501',
-                'timeout' => '0'
-            ),
-            'pubsub_remarketing' => array(
-                'prefix' => 'adx_v1',
-                'component' => 'font-end',
-                'host' => '10.199.0.3',
-                'port' => '6530',
+            'info' => array(
+                'prefix' => 'mt_ping',
+                'component' => 'front-end',
+                'host' => '127.0.0.1',
+                'port' => '6379',
                 'timeout' => '0'
             )
         )

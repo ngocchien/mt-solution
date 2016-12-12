@@ -1,6 +1,6 @@
 <?php
 define('LOG_FOLDER', ROOT_PATH . '/data/logs');
-define('KEY_PREFIX', 'chiennn_');
+define('KEY_PREFIX', 'mt_');
 
 if (php_sapi_name() != 'cli') {
     $protocol = strtolower(substr($_SERVER["SERVER_PROTOCOL"], 0, 5)) == 'https' ? 'https' : 'http';

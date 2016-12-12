@@ -15,14 +15,9 @@ return array(
     'elastic' => array(
         'adapters' => array(
             'info_slave' => array(
-                'host' => '10.199.0.1',
-                'transport.port' => '9199',
-                'http.port' => '9299'
-            ),
-            'info_master' => array(
-                'host' => '10.199.0.1',
-                'transport.port' => '9199',
-                'http.port' => '9299'
+                'host' => '127.0.0.1',
+                'transport.port' => '9200',
+                'http.port' => '9200',
             )
         )
     )

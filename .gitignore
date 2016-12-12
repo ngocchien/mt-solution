@@ -13,5 +13,5 @@ composer.phar
 #server/scripts/production/*
 # config
 #config/autoload/production/*
-config/domain/production/*
-config/domain/development/*
+#config/domain/production/*
+#config/domain/development/*
