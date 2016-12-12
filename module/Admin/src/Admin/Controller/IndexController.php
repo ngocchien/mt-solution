@@ -13,7 +13,10 @@ class IndexController extends AbstractActionController
 {
     public function indexAction()
     {
-        
+        echo '<pre>';
+        print_r('22');
+        echo '</pre>';
+        die();
         return new ViewModel();
     }
 }

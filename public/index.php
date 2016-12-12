@@ -1,6 +1,15 @@
 <?php
-echo '<center><h1>WELCOME TO MT-PING</h1></center>';return;
-ini_set("display_errors", 1);
+mb_internal_encoding('UTF-8');
+mb_http_output('UTF-8');
+mb_http_input('UTF-8');
+mb_language('uni');
+mb_regex_encoding('UTF-8');
+ob_start('mb_output_handler');
+
+//
+//echo '<center><h1>WELCOME TO MT-PING</h1></center>';
+//return;
+ini_set("display_errors", 0);
 
 //Root path
 define('ROOT_PATH', realpath(dirname(__FILE__) . '/..'));
@@ -42,51 +51,15 @@ if (php_sapi_name() === 'cli-server') {
 // Setup autoloading
 require 'init_autoloader.php';
 
-//Load namespaces
-//Zend\Loader\AutoloaderFactory::factory(array(
-//    'Zend\Loader\StandardAutoloader' => array(
-//        'namespaces' => array(
-//            'ADX' => __DIR__ . '/../package/ANTS/library/ADX',
-//        ),
-//    )
-//));
-
-
 // Run the application!
 Zend\Mvc\Application:: init(require 'config/application.config.php')->run();
 
 //init function debug
-if(isset($_GET['d_pro_p'])) {
+if (isset($_GET['d_pro_p'])) {
     $domain = $_SERVER['SERVER_NAME'];
-    if($_GET['d_pro_p'] == 'true'){
+    if ($_GET['d_pro_p'] == 'true') {
         setcookie('d_pro_p', 'd_pro_p', time() + 3600, '/', $domain);
-    }else{
+    } else {
         setcookie('d_pro_p', '', time() - 3600, '/', $domain);
-    }
-}
-function pr($data, $die = true)
-{
-    $pr = false;
-    if(APPLICATION_ENV == 'development'){
-        $pr = true;
-    }else{
-        if(isset($_GET['d_pro']) && $_GET['d_pro'] == true){
-            $pr = true;
-        }
-        $cookie_debug = 'd_pro_p';
-        $my_ck = isset($_COOKIE['d_pro_p']) ? $_COOKIE['d_pro_p'] : '';
-        if($my_ck == $cookie_debug){
-            $pr = true;
-        }
-    }
-    if($pr == true){
-        $trace = debug_backtrace();
-        $caller = array_shift($trace);
-        echo '<pre>';
-        echo "called by [" . $caller['file'] . "] line: " . $caller['line'] . "\n";
-        print_r($data);
-        if ($die) {
-            exit;
-        }
     }
 }
