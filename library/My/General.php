@@ -72,6 +72,8 @@ class General
         'client_secret' => 'yuNS6kJUsU69NX7rPXRIrU4C'
     ];
 
+    const YOUTUBE_TOKEN = '4/4ftUgthFxrvneNdMoDl-uX1fHEcP_Z3MfFx1WmGC5zI';
+
     static $cate_videos = [26, 27, 28, 29, 30, 31, 32, 33, 34];
 
     public static function getSlug($string, $maxLength = 255, $separator = '-')

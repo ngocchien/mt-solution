@@ -32,6 +32,8 @@ class Test
 
             // Define an object that will be used to make all API requests.
             $youtube = new \Google_Service_YouTube($client);
+
+            $total = count($arr_channel);
             for ($i = 0; $i <= $total; $i++) {
                 $token_page = null;
                 for ($page = 0; $page <= 1000; $page++) {
@@ -121,12 +123,14 @@ class Test
                             $avail_formats[$j]['ip'] = $ip;
                             $j++;
                         }
-                        echo '<pre>';
-                        print_r($avail_formats);
-                        die();
-                        exec('wget -O ' . $path . $avail_formats[0]['url'] . '"');
 
-                        echo '123123';
+                        $k = exec('wget -O ' . $path . $avail_formats[0]['url'] . '"');
+
+                        echo '<pre>';
+                        print_r($k);
+                        echo '</pre>';
+                        die();
+                        echo $k;
                         die();
 
                     }
@@ -151,6 +155,10 @@ class Test
             $google_config = General::$google_config;
             $client = new \Google_Client();
             $client->setDeveloperKey($google_config['key']);
+            $client->setScopes('https://www.googleapis.com/auth/youtube');
+
+            $client->authenticate(General::YOUTUBE_TOKEN);
+            $client->setAccessToken($client->getAccessToken());
 
             $videoPath = $params['video_path'];
 
