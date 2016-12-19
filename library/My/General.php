@@ -74,6 +74,8 @@ class General
 
     const YOUTUBE_TOKEN = '4/4ftUgthFxrvneNdMoDl-uX1fHEcP_Z3MfFx1WmGC5zI';
 
+    const KEY_VIDEOS = 'vd';
+
     static $cate_videos = [26, 27, 28, 29, 30, 31, 32, 33, 34];
 
     public static function getSlug($string, $maxLength = 255, $separator = '-')
@@ -531,7 +533,7 @@ class General
         return $ip;
     }
 
-    public static function crawler($strURL = '', $strCookiePath = '', $arrHeader = array(), $arrData = array())
+    public static function crawler($strURL = '', $strCookiePath = '', $arrHeader = array(), $arrData = array(), $method = 0)
     {
         try {
             if (empty($strURL)) {
@@ -556,8 +558,10 @@ class General
             curl_setopt($crawler, CURLOPT_FRESH_CONNECT, TRUE);
             curl_setopt($crawler, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36');
             curl_setopt($crawler, CURLOPT_RETURNTRANSFER, TRUE);
-            $arrData ? curl_setopt($crawler, CURLOPT_POSTFIELDS, $arrData) : '';
+            $arrData ? curl_setopt($crawler, CURLOPT_POSTFIELDS, json_encode($arrData)) : '';
             curl_setopt($crawler, CURLOPT_SSL_VERIFYPEER, FALSE);
+
+            $method ? curl_setopt($crawler, CURLOPT_POST, 1) : '';
 
             $data = curl_exec($crawler);
             curl_close($crawler);

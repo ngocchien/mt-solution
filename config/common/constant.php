@@ -1,5 +1,6 @@
 <?php
 define('TOKEN_ROLE', 2);
+//define('KEY_VIDEOS', 'vd');
 //ngocchien00
 //static $google_config = [
 //    'key' => 'AIzaSyBlTq9Ah3zwzATAT0C76Fq7wVz0aE6wazM',

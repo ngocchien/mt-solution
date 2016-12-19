@@ -24,9 +24,9 @@ return array(
                 ),
                 'function' => array(
                     'admin_process' => KEY_PREFIX . "admin_process_job",
-                    'admin_elastic' => KEY_PREFIX . "admin_elastic_job",
-                    'admin_redis' => KEY_PREFIX . "admin_redis_job",
-                    'admin_debug' => KEY_PREFIX . "admin_debug_job"
+                    'admin_debug' => KEY_PREFIX . "admin_debug_job",
+                    'admin_upload' => KEY_PREFIX . "admin_upload_job",
+                    'admin_helper' => KEY_PREFIX . "admin_helper_job"
                 )
             )
         )

@@ -7,23 +7,44 @@
  */
 namespace TASK;
 
-use MT\Exception;
-use MT\Utils;
-use MT\Model;
-use My\General;
+use MT\Model,
+    My\General;
 
 class Test
 {
-
-    public function cloneYoutube($params)
+    public function cloneYoutube()
     {
         date_default_timezone_set('Asia/Saigon');
         $fileNameSuccess = __CLASS__ . '_' . __FUNCTION__ . '_Success';
         $fileNameError = __CLASS__ . '_' . __FUNCTION__ . '_Error';
         $arrParam = [];
         try {
+            $arr_tags = [
+                'khampha.tech',
+                'hai huoc',
+                'hài hước',
+                'vui nhộn',
+                'funny',
+                'góc thư giãn',
+                'vui nhon',
+                'goc hai huoc',
+                'cuoi vo bung',
+                'cười vỡ bụng',
+                'cười bể bụng bò',
+                'goc hai huoc',
+                'cười',
+                'cuoi',
+                'zui la chinh',
+                'vui là chính',
+                'video hài hước',
+                'clip hài hước'
+            ];
+
             $arr_channel = [
-                'UCj6B4cj9mB9JXWW65T4Sh4w'
+                'UCj6B4cj9mB9JXWW65T4Sh4w' => 24,
+                'UClhyt3rQT2He_2Ynl9MMt1w' => 24,
+                'UCrKjPCoN3d7s1_YzmMdOXbg' => 17,
+                'UCW7WlDN4HSD8kopuN5ZflbQ' => 17
             ];
 
             $google_config = \My\General::$google_config;
@@ -33,14 +54,13 @@ class Test
             // Define an object that will be used to make all API requests.
             $youtube = new \Google_Service_YouTube($client);
 
-            $total = count($arr_channel);
-            for ($i = 0; $i <= $total; $i++) {
+            foreach ($arr_channel as $channelId => $categoryId) {
                 $token_page = null;
                 for ($page = 0; $page <= 1000; $page++) {
                     if ($page == 0) {
                         $searchResponse = $youtube->search->listSearch(
                             'snippet', array(
-                                'channelId' => $arr_channel[$i],
+                                'channelId' => $channelId,
                                 'maxResults' => 50
                             )
                         );
@@ -50,7 +70,7 @@ class Test
                         }
                         $searchResponse = $youtube->search->listSearch(
                             'snippet', array(
-                                'channelId' => $arr_channel[$i],
+                                'channelId' => $channelId,
                                 'maxResults' => 50,
                                 'pageToken' => $token_page
                             )
@@ -67,8 +87,8 @@ class Test
                         if (empty($item) || empty($item->getSnippet())) {
                             continue;
                         }
-                        $id = $item->getId()->getVideoId();
 
+                        $id = $item->getId()->getVideoId();
 
                         if (empty($id)) {
                             continue;
@@ -76,7 +96,7 @@ class Test
 
                         $redis = \MT\Nosql\Redis::getInstance('caching');
 
-                        if ($redis->GET($id)) {
+                        if ($redis->GET('vd:' . $id)) {
                             continue;
                         }
 
@@ -86,8 +106,7 @@ class Test
                             continue;
                         }
 
-                        //Limit request token in day: time, count
-                        $status = $redis->SET($id, General::getSlug($title));
+                        $status = $redis->SET('vd:' . $id, true);
 
                         if (!$status) {
                             continue;
@@ -124,22 +143,41 @@ class Test
                             $j++;
                         }
 
-                        $k = exec('wget -O ' . $path . $avail_formats[0]['url'] . '"');
+                        exec('wget -O ' . $path . $avail_formats[0]['url'] . '"');
+                        $arr_tags[] = $title;
 
-                        echo '<pre>';
-                        print_r($k);
-                        echo '</pre>';
-                        die();
-                        echo $k;
-                        die();
+                        \MT\Utils::runJob(
+                            'info',
+                            'TASK\Test',
+                            'uploadYt',
+                            'doHighBackgroundTask',
+                            'admin_upload',
+                            [
+                                'title' => $title,
+                                'categoryId' => $categoryId,
+                                'path' => $path,
+                                'tags' => $arr_tags,
+                                'description' => '
+                                Tổng hợp clip vui nhộn, hài hước <br>
+                                Chúc các bạn có những giây phút thư giãn thật vui vẻ <br>
+                                <a href="http://khampha.tech">Khám phá khoa học</a>
+                            ',
+                                'action' => __FUNCTION__
+                            ]
+                        );
 
+                        continue;
                     }
                 }
             }
-            Utils::writeLog($fileNameSuccess, $arrParam);
+            \MT\Utils::writeLog($fileNameSuccess, $arrParam);
         } catch
         (\Exception $e) {
-            throw new Exception($e->getMessage(), $e->getCode());
+            $arrParam['exc'] = [
+                'code' => $e->getCode(),
+                'messages' => $e->getMessage()
+            ];
+            \MT\Utils::writeLog($fileNameError, $arrParam);
         }
     }
 
@@ -152,23 +190,26 @@ class Test
             'params_input' => $params
         ];
         try {
+            //token youtube
+            $redis = \MT\Nosql\Redis::getInstance('caching');
+            $token = $redis->HGET('token:youtube', 'access_token');
+
             $google_config = General::$google_config;
             $client = new \Google_Client();
-            $client->setDeveloperKey($google_config['key']);
+            $client->setClientId($google_config['client_id']);
+            $client->setClientSecret($google_config['client_secret']);
             $client->setScopes('https://www.googleapis.com/auth/youtube');
-
-            $client->authenticate(General::YOUTUBE_TOKEN);
-            $client->setAccessToken($client->getAccessToken());
-
-            $videoPath = $params['video_path'];
 
             // Define an object that will be used to make all API requests.
             $youtube = new \Google_Service_YouTube($client);
+            $client->setAccessToken($token);
+
+            //snippet
             $snippet = new \Google_Service_YouTube_VideoSnippet();
             $snippet->setTitle($params['title']);
             $snippet->setDescription($params['description']);
-            $snippet->setTags(array("tag1", "tag2"));
-            $snippet->setCategoryId("22");
+            $snippet->setTags($params['tags']);
+            $snippet->setCategoryId($params['categoryId']);
 
             //status
             $status = new \Google_Service_YouTube_VideoStatus();
@@ -193,10 +234,10 @@ class Test
                 true,
                 $chunkSizeBytes
             );
-            $media->setFileSize(filesize($videoPath));
+            $media->setFileSize(filesize($params['path']));
 
             $status = false;
-            $handle = fopen($videoPath, "rb");
+            $handle = fopen($params['path'], "rb");
             while (!$status && !feof($handle)) {
                 $chunk = fread($handle, $chunkSizeBytes);
                 $status = $media->nextChunk($chunk);
@@ -207,21 +248,16 @@ class Test
             // If you want to make other calls after the file upload, set setDefer back to false
             $client->setDefer(false);
 
-            echo '<pre>';
-            print_r($status);
-            echo '</pre>';
-            die();
-
-            Utils::writeLog($fileNameSuccess, $arrParam);
+            if (!empty($status['id'])) {
+                @unlink($params['path']);
+            }
+            \MT\Utils::writeLog($fileNameSuccess, $arrParam);
         } catch (\Exception $e) {
-            echo '<pre>';
-            print_r([
+            $arrParam['exc'] = [
                 'code' => $e->getCode(),
                 'messages' => $e->getMessage()
-            ]);
-            echo '</pre>';
-            die();
-            Utils::writeLog($fileNameError, $arrParam);
+            ];
+            \MT\Utils::writeLog($fileNameError, $arrParam);
         }
     }
 }
