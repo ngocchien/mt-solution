@@ -11,20 +11,72 @@ class IndexController extends AbstractAdminRestController
 {
     public function indexAction()
     {
+        //client_secret=yuNS6kJUsU69NX7rPXRIrU4C&grant_type=refresh_token&refresh_token=1%2FyeOm41z-ONX4kdpghOUqprx_t3dCOGY9bNIiuG_HipLOvis2gCBMiGdKa1FHkWzL&client_id=305277173466-i7u7cmv0a7gqco2rj86a9p99jbokp9lq.apps.googleusercontent.com
         try {
+            $google_config = \My\General::$google_config;
+            $client = new \Google_Client();
+            $client->setClientId($google_config['client_id']);
+            $client->setClientSecret($google_config['client_secret']);
+            $client->setAccessType("offline");
+            $client->setApprovalPrompt("force");
+            $client->refreshToken($google_config['refresh_token']);
+            $new_token = $client->getAccessToken();
+
+            echo '<pre>';
+            print_r($new_token);
+            echo '</pre>';
+            die();
+        } catch (\Exception $ex) {
+            echo '<pre>';
+            print_r($ex->getMessage());
+            echo '</pre>';
+            die();
+        }
+        die('1111');
+        try {
+            $google_config = \My\General::$google_config;
+            $client = new \Google_Client();
+//            $client->setClientId($google_config['client_id']);
+//            $client->setClientSecret($google_config['client_secret']);
+            $client->setClientId('305277173466-i7u7cmv0a7gqco2rj86a9p99jbokp9lq.apps.googleusercontent.com');
+            $client->setClientSecret('yuNS6kJUsU69NX7rPXRIrU4C');
+            $client->setAccessType("offline");
+            $client->setApprovalPrompt("force");
+
+//            $url = 'https://www.googleapis.com/oauth2/v4/token?client_id=305277173466-i7u7cmv0a7gqco2rj86a9p99jbokp9lq.apps.googleusercontent.com&client_secret=yuNS6kJUsU69NX7rPXRIrU4C&refresh_token=1/5_0h3Lq9dvLz-OJzRUQgr1EKl-PqVghpAWmyGC6mi-bcJiCSHVXYxRy87EGyw1Wt&grant_type=refresh_token';
+//            $rp = \My\General::crawler($url, '', [], [], 1);
+//            echo '<pre>';
+//            print_r($rp);
+//            echo '</pre>';
+//            die();
+
+//            client_id=8819981768.apps.googleusercontent.com&
+//            client_secret=your_client_secret&
+//            refresh_token=1/6BMfW9j53gdGImsiyUH5kU5RsR4zwI9lUVX-tqf8JXQ&
+//            grant_type=refresh_token
+
+            //$config_token
+            $config_token = \My\General::$youtube_tooken;
+            $client->refreshToken('1/5_0h3Lq9dvLz-OJzRUQgr1EKl-PqVghpAWmyGC6mi-bcJiCSHVXYxRy87EGyw1Wt');
+            $new_token = $client->getAccessToken();
+            echo '<pre>';
+            print_r($new_token);
+            echo '</pre>';
+            die();
+
             $configApi = \My\General::$google_config;
 
 //            ya29.Ci-5A5UpmkCcpV6lI03FW518ctUk1bMAwS1NW8EifsUzI-T5Bmx8pma51u0kIJJHXg
 
             //token youtube
             $redis = \MT\Nosql\Redis::getInstance('caching');
-            $redis->HMSET('token:youtube', 'access_token','ya29.Ci-5A5UpmkCcpV6lI03FW518ctUk1bMAwS1NW8EifsUzI-T5Bmx8pma51u0kIJJHXg');
+            $redis->HMSET('token:youtube', 'access_token', 'ya29.Ci-5A5UpmkCcpV6lI03FW518ctUk1bMAwS1NW8EifsUzI-T5Bmx8pma51u0kIJJHXg');
 //            echo '<pre>';
 //            print_r($redis->HGET('token:youtube', 'access_token'));
 //            echo '</pre>';
 //            die();
             echo '<pre>';
-            print_r($redis->HGET('token:youtube','access_token'));
+            print_r($redis->HGET('token:youtube', 'access_token'));
             echo '</pre>';
             die();
             $refresh_token = $redis->HGET('token:youtube', 'refresh_token');

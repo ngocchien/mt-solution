@@ -72,15 +72,17 @@ if ($verbose) {
 }
 
 switch ($type) {
-    case 'token_youtube':
+    case 'refresh_token':
         ADX\Utils::runJob(
             'info',
-            'TASK\Test',
-            '',
+            'TASK\Refresh',
+            'tokenYoutube',
             'doHighBackgroundTask',
             'admin_helper',
-            array(//params
-            )
+            [
+                'actor' => 'chiennn',
+                'action' => 'refresh token for user'
+            ]
         );
         break;
     default :

@@ -9,7 +9,7 @@ ob_start('mb_output_handler');
 //
 //echo '<center><h1>WELCOME TO MT-PING</h1></center>';
 //return;
-ini_set("display_errors", 0);
+ini_set("display_errors", 1);
 
 //Root path
 define('ROOT_PATH', realpath(dirname(__FILE__) . '/..'));

@@ -1,10 +1,10 @@
 #!/bin/sh
 # KhamDB
-export PATH="/usr/kerberos/sbin:/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin:"
+export PATH="/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin:"
 export APPLICATION_ENV=development
-php_bin="/build/phpADSV3/bin/php"
-php_ini="/build/phpADSV3/etc/php.ini"
-job_path="/home/khamdb/v3.adx.vn/server/job"
+php_bin="/usr/bin/php"
+php_ini="/etc/php.ini"
+job_path="/var/www/chiennn/html/server/job/"
 env="$1"
 job_file="$2"
 debug="$3"
