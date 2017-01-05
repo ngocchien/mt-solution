@@ -15,11 +15,11 @@ stop)
 	;;
 start)
 	echo '=========== Start worker worker-admin =============='
-    sh $script_path/restart_job_adx.sh $env worker-admin.php false
+    sh $script_path/restart_job.sh $env worker-admin.php false
     echo '=========== Start worker worker-helper =============='
-    sh $script_path/restart_job_adx.sh $env worker-helper.php false
+    sh $script_path/restart_job.sh $env worker-helper.php false
 	echo '=========== Start worker worker-upload =============='
-    sh $script_path/restart_job_adx.sh $env worker-upload.php false
+    sh $script_path/restart_job.sh $env worker-upload.php false
 	;;
 *)
 	echo "Usage: $0 $env <start|stop>"
