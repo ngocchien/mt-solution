@@ -22,6 +22,10 @@ class IndexController extends AbstractAdminRestController
             $client->refreshToken($google_config['refresh_token']);
             $new_token = $client->getAccessToken();
 
+            //set lại xuống redis
+            $redis = \MT\Nosql\Redis::getInstance('caching');
+            $redis->HMSET('token:youtube', 'access_token', $new_token['access_token']);
+
             echo '<pre>';
             print_r($new_token);
             echo '</pre>';

@@ -42,9 +42,21 @@ class Test
 
             $arr_channel = [
                 'UCj6B4cj9mB9JXWW65T4Sh4w' => 24,
-                'UClhyt3rQT2He_2Ynl9MMt1w' => 24,
                 'UCrKjPCoN3d7s1_YzmMdOXbg' => 17,
-                'UCW7WlDN4HSD8kopuN5ZflbQ' => 17
+                'UCW7WlDN4HSD8kopuN5ZflbQ' => 17,
+                'UC7kEGojK79YjOeHMhR9IYiA' => 17,
+                'UCL0dxOYvGs_bdEQHA1ljN-g' => 24,
+                'UCeAlYe-FDWztQrEnxKhXUDA' => 24,
+                'UCXVmFKJdknhsl-Co6gUAhOA' => 17,
+                'UCvTkvGaMmBCXbqkxpjhne3g' => 24,
+                'UCp09s-igQEpsIet-qyD6Vcw' => 24,
+                'UCBy4rpjPI1NPZhBV4d3SnLg' => 17, //Videos hot
+                'UC8h2O0acnepicR8mxk667xw' => 17, //hoat hinh
+                'UCWhkVvXZfdRV0SnYKPEBjJg' => 17,
+                'UCqImkRdgV9OZtfrmf7-2Ukw' => 17,
+                'UCZNoTFTsrWXA-dXElRm90bA' => 24,
+                'UCoXlAYmyv1oXX1HdgJA3uGA' => 17,
+                'UCn0GEHVGyWYKdEBzjRGJk4g' => 17
             ];
 
             $google_config = \My\General::$google_config;

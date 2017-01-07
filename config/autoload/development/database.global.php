@@ -4,7 +4,7 @@ return array(
         'adapters' => array(
             'info_slave' => array(
                 'driver' => 'Pdo_Mysql',
-                'database' => 'the_news',
+                'database' => 'mt_solution',
                 'host' => 'localhost',
                 'options' => array('buffer_results' => true),
                 'driver_options' => array(
