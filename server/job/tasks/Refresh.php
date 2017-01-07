@@ -21,7 +21,7 @@ class Refresh
         $arrParam = [
             'params_input' => $params
         ];
-        
+
         try {
             $google_config = \My\General::$google_config;
             $client = new \Google_Client();
@@ -30,11 +30,11 @@ class Refresh
             $client->setAccessType("offline");
             $client->setApprovalPrompt("force");
             $client->refreshToken($google_config['refresh_token']);
-            $response = $client->getAccessToken();
+            $new_token = $client->getAccessToken();
 
             //set lại xuống redis
             $redis = \MT\Nosql\Redis::getInstance('caching');
-            $redis->HMSET('token:youtube', 'access_token', $response['access_token']);
+            $redis->HSET('token:youtube', 'access_token', $new_token['access_token']);
 
             \MT\Utils::writeLog($fileNameSuccess, $arrParam);
 

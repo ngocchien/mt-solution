@@ -11,12 +11,12 @@ case "$1" in
 5min)
 	;;
 30min)
-
+    $php_bin -c $php_ini /var/www/mt-pingpong/html/server/job/crontab/refresh.php --env $env --type "refresh_token"
 	;;
 50min)
 
     ##monitor creative-no-lineitem
-    $php_bin -c $php_ini /var/www/mt-pingpong/html/server/job/crontab/refresh.php --env $env --type "refresh_token"
+    ##$php_bin -c $php_ini /var/www/mt-pingpong/html/server/job/crontab/refresh.php --env $env --type "refresh_token"
 ;;
 hour)
 

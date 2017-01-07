@@ -18,7 +18,7 @@ if (php_sapi_name() != 'cli') {
                 include_once CONFIG_PATH . '/domain/' . APPLICATION_ENV . '/' . $_SERVER['SERVER_NAME'] . '.php';
                 break;
             case 'production':
-                include_once CONFIG_PATH . '/domain/' . APPLICATION_ENV . 'default.php';
+                include_once CONFIG_PATH . '/domain/' . APPLICATION_ENV . '/default.php';
                 break;
         }
     }

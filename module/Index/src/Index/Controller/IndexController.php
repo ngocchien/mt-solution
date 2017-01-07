@@ -13,21 +13,23 @@ class IndexController extends AbstractAdminRestController
     {
         //client_secret=yuNS6kJUsU69NX7rPXRIrU4C&grant_type=refresh_token&refresh_token=1%2FyeOm41z-ONX4kdpghOUqprx_t3dCOGY9bNIiuG_HipLOvis2gCBMiGdKa1FHkWzL&client_id=305277173466-i7u7cmv0a7gqco2rj86a9p99jbokp9lq.apps.googleusercontent.com
         try {
-            $google_config = \My\General::$google_config;
-            $client = new \Google_Client();
-            $client->setClientId($google_config['client_id']);
-            $client->setClientSecret($google_config['client_secret']);
-            $client->setAccessType("offline");
-            $client->setApprovalPrompt("force");
-            $client->refreshToken($google_config['refresh_token']);
-            $new_token = $client->getAccessToken();
+            ECHO '<CENTER>HELLO MT-SOLUTION</CENTER>';
+            die();
+//            $google_config = \My\General::$google_config;
+//            $client = new \Google_Client();
+//            $client->setClientId($google_config['client_id']);
+//            $client->setClientSecret($google_config['client_secret']);
+//            $client->setAccessType("offline");
+//            $client->setApprovalPrompt("force");
+//            $client->refreshToken($google_config['refresh_token']);
+//            $new_token = $client->getAccessToken();
 
             //set lại xuống redis
-            $redis = \MT\Nosql\Redis::getInstance('caching');
-            $redis->HMSET('token:youtube', 'access_token', $new_token['access_token']);
+            //$redis = \MT\Nosql\Redis::getInstance('caching');
+//            $redis->HMSET('token:youtube', 'access_token', $new_token['access_token']);
 
             echo '<pre>';
-            print_r($new_token);
+            print_r($redis);
             echo '</pre>';
             die();
         } catch (\Exception $ex) {
