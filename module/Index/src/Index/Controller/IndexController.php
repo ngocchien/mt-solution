@@ -11,6 +11,137 @@ class IndexController extends AbstractAdminRestController
 {
     public function indexAction()
     {
+//        $instanceKeyword = new \MT\Model\Keyword();
+//        $arr_data = $instanceKeyword->getData([
+//            'limit' => 200,
+//            'page' => 1,
+//            'order_by' => 'key_id asc'
+//        ]);
+//        echo '<pre>';
+//        print_r($arr_data);
+//        echo '</pre>';
+//        die();
+        $instanceSearchKeyword = new \MT\Search\Keyword();
+        $is_exits = $instanceSearchKeyword->searchData([
+//            'key_slug' => trim(\My\General::getSlug('Falcons score')),
+//            'key_id' => 1,
+//            'match_key_name' => 'Green Bay',
+            'like_key_name' => 'Green Bay',
+            'limit' => 100,
+            'page' => 1,
+            'sort' => ['_score'=>['order'=>'desc']]
+//            'source' => ['key_id']
+        ]);
+        echo '<pre>';
+        print_r($is_exits);
+        echo '</pre>';
+        die();
+        die('abc');
+        $instanceSearchKeyword = new \MT\Search\Keyword();
+        foreach ($arr_data as $value){
+            $instanceSearchKeyword->add($value);
+        }
+        die('done');
+
+        $status = $instanceSearchKeyword->createIndex();
+        echo '<pre>';
+        print_r($status);
+        echo '</pre>';
+        die();
+
+//        $params = [
+//            'key_id' => 1,
+//            'key_name' => 'chiennn1111111',
+//            'key_slug' => 'chiennn1111111',
+//            'is_crawler' => 1,
+//            'key_description' => ''
+//        ];
+//        $result = $instanceSearchKeyword->add($params);
+////        $result = $instanceSearchKeyword->update($params);
+//        echo '<pre>';
+//        print_r($result);
+//        echo '</pre>';
+//        die();
+        $arr_data = [
+            'videos',
+            'clip',
+            'music',
+            'film',
+            'trailer'
+        ];
+
+        $serviceKeyword = new \MT\Model\Keyword();
+
+        foreach ($arr_data as $key_name) {
+            $params = [
+                'key_name' => $key_name,
+                'key_slug' => \My\General::getSlug($key_name),
+                'is_crawler' => 0,
+                'key_description' => '',
+                'created_date' => time()
+            ];
+            $result = $serviceKeyword->add($params);
+            echo '<pre>';
+            print_r($result);
+            echo '</pre>';
+//            die();
+        }
+        die();
+
+//        $params = [
+//            'condition' => [
+//                'key_id' => 4
+//            ],
+//            'params' => [
+//                'key_name' => 'chiennn'
+//            ]
+//        ];
+
+//        $count = count($arr_data);
+        $instanceKeyword = new \MT\Model\Keyword();
+        $result = $instanceKeyword->getData([
+            'limit' => 2,
+            'page' => 1
+        ]);
+        echo '<pre>';
+        print_r($result);
+        echo '</pre>';
+        die();
+
+        $result = $instanceKeyword->update($params);
+        echo '<pre>';
+        print_r($result);
+        echo '</pre>';
+        die();
+
+        $result = $instanceKeyword->delete([
+            'key_id' => 1
+        ]);
+        echo '<pre>';
+        print_r($result);
+        echo '</pre>';
+        die();
+
+        for ($i = 0; $i < $count; $i++) {
+            $data = [
+                'key_name' => $arr_data[$i],
+                'key_slug' => \My\General::getSlug($arr_data[$i]),
+                'is_crawler' => 0
+            ];
+            $result = $instanceKeyword->create($data);
+            echo '<pre>';
+            print_r($result);
+            echo '</pre>';
+            die();
+
+        }
+
+        $intanceSearchKeyword = new \MT\Search\Keyword();
+        $status = $intanceSearchKeyword->createIndex();
+        echo '<pre>';
+        print_r($status);
+        echo '</pre>';
+        die();
         //client_secret=yuNS6kJUsU69NX7rPXRIrU4C&grant_type=refresh_token&refresh_token=1%2FyeOm41z-ONX4kdpghOUqprx_t3dCOGY9bNIiuG_HipLOvis2gCBMiGdKa1FHkWzL&client_id=305277173466-i7u7cmv0a7gqco2rj86a9p99jbokp9lq.apps.googleusercontent.com
         try {
             ECHO '<CENTER>HELLO MT-SOLUTION</CENTER>';

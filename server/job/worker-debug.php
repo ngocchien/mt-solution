@@ -65,6 +65,32 @@ if ($verbose) {
 }
 
 try {
+//    \MT\Utils::runJob(
+//        'info',
+//        'TASK\Crawler',
+//        'crawlerKeyword',
+//        'doHighBackgroundTask',
+//        'admin_crawler',
+//        array(
+//            'actor' => __FUNCTION__,
+//            'id' => 1
+//        )
+//    );
+//    die('done');
+
+    \MT\Utils::runJob(
+        'info',
+        'TASK\Crawler',
+        'hotTrend',
+        'doHighBackgroundTask',
+        'admin_crawler',
+        array(
+            'actor' => __FUNCTION__,
+            'init_key' => true
+        )
+    );
+    die('done');
+
     \MT\Utils::runJob(
         'info',
         'TASK\Test',

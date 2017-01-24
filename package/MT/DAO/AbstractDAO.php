@@ -12,12 +12,53 @@ abstract class AbstractDAO
     protected $_page;
     protected $_table;
     protected $_sort;
+    protected $_params;
+    protected $_query;
+    protected $_column;
+    protected $_adapter;
+    protected $_data_rsyn;
 
-    protected function _clearInstance($id)
+    public function setDataRsyn($data_rsyn)
     {
-        $className = str_replace('DAO', "Model", get_called_class());
-        $className::clearInstance($id);
-        return 1;
+        $this->_data_rsyn = $data_rsyn;
+        return $this;
+    }
+
+    public function getDataRsyn()
+    {
+        return $this->_data_rsyn;
+    }
+
+    public function setAdapter($adapter)
+    {
+        $this->_adapter = $adapter;
+    }
+
+    public function getAdapter()
+    {
+        return $this->_adapter;
+    }
+
+    public function setColumn($column = [])
+    {
+        $this->_column = $column;
+        return $this;
+    }
+
+    public function getColumn()
+    {
+        return $this->_column;
+    }
+
+    public function setQuery($query)
+    {
+        $this->_query = $query;
+        return $this;
+    }
+
+    public function getQuery()
+    {
+        return $this->_query;
     }
 
     public function setTable($_table)
@@ -31,6 +72,17 @@ abstract class AbstractDAO
         return $this->_table;
     }
 
+    public function setParams($params)
+    {
+        $this->_params = $params;
+        return $this;
+    }
+
+    public function getParams()
+    {
+        return $this->_params;
+    }
+
     public function setLimit($_limit)
     {
         $this->_limit = $_limit;
@@ -39,7 +91,7 @@ abstract class AbstractDAO
 
     public function getLimit()
     {
-        return $this->_limit ? $this->_limit : 20;
+        return $this->_limit;
     }
 
     public function setPage($_page)
@@ -53,12 +105,18 @@ abstract class AbstractDAO
         return $this->_page ? $this->_page : 1;
     }
 
-    public function getOffset()
+    public function setOffset($offset)
     {
-        return $this->getLimit() * ($this->getPage() - 1);
+        $this->_offset = $offset;
+        return $this;
     }
 
-    public function setSort($sort = ['cate_sort ASC'])
+    public function getOffset()
+    {
+        return $this->_offset;
+    }
+
+    public function setSort($sort)
     {
         $this->_sort = $sort;
         return $this;
@@ -66,12 +124,58 @@ abstract class AbstractDAO
 
     public function getSort()
     {
-        return $this->_sort ? $this->_sort : ['cate_sort ASC'];
+        return $this->_sort;
     }
 
-    public function executeQuery($strWhere = '')
+    public function insert()
     {
         try {
+            $p_arrParams = $this->getParams();
+            if (!is_array($p_arrParams) || empty($p_arrParams)) {
+                return false;
+            }
+            $adapter = Database::getInstance('info_slave');
+            $sql = new Sql($adapter);
+            $insert = $sql->insert($this->getTable())->values($p_arrParams);
+            $query = $sql->getSqlStringForSqlObject($insert);
+            $adapter->createStatement($query)->execute();
+            $result = $adapter->getDriver()->getLastGeneratedValue();
+            return $result;
+        } catch (\Exception $exc) {
+            if (APPLICATION_ENV !== 'production') {
+                die($exc->getMessage());
+            }
+            return false;
+        }
+    }
+
+    public function edit()
+    {
+        try {
+            $param = $this->getParams();
+            $query = $this->getQuery();
+            if (!is_array($param) || empty($param) || empty($query)) {
+                return false;
+            }
+            $adapter = Database::getInstance('info_slave');
+            $sql = new Sql($adapter);
+            $update = $sql->update($this->getTable())->set($param)->where('1=1 ' . $query);
+            $statement = $sql->prepareStatementForSqlObject($update);
+            $result = $statement->execute();
+            return $result->getAffectedRows();
+        } catch (\Exception $exc) {
+            if (APPLICATION_ENV !== 'production') {
+                die($exc->getMessage());
+            }
+            return false;
+        }
+
+    }
+
+    public function get()
+    {
+        try {
+            $strWhere = $this->getQuery();
             $adapter = Database::getInstance('info_slave');
             $sql = new Sql($adapter);
             $select = $sql->Select($this->getTable())
@@ -79,13 +183,48 @@ abstract class AbstractDAO
                 ->order($this->getSort())
                 ->offset($this->getOffset())
                 ->limit($this->getLimit());
+            if ($this->getColumn()) {
+                $select->columns($this->getColumn());
+            }
             $query = $sql->getSqlStringForSqlObject($select);
             return $adapter->query($query, $adapter::QUERY_MODE_EXECUTE)->toArray();
         } catch (\Exception $e) {
-            echo '<pre>';
-            print_r($e->getMessage());
-            echo '</pre>';
-            die();
+            if (APPLICATION_ENV !== 'production') {
+                echo '<pre>';
+                print_r($e->getMessage());
+                echo '</pre>';
+                die();
+            }
+            return false;
         }
+    }
+
+    public function rsynDataEs()
+    {
+        try {
+            $data = $this->getDataRsyn();
+            \MT\Utils::runJob(
+                'info',
+                'TASK\SynDataEs',
+                'rsynData',
+                'doHighBackgroundTask',
+                'admin_process',
+                array(
+                    'actor' => 'admin_rsyn',
+                    'index' => $data['index'],
+                    'params_es' => $data['params_es'],
+                    'type' => $data['type']
+                )
+            );
+        } catch (\Exception $e) {
+            if (APPLICATION_ENV !== 'production') {
+                echo '<pre>';
+                print_r($e->getMessage());
+                echo '</pre>';
+                die();
+            }
+            return false;
+        }
+
     }
 } 

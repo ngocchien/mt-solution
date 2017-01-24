@@ -20,6 +20,8 @@ start)
     sh $script_path/restart_job.sh $env worker-helper.php false
 	echo '=========== Start worker worker-upload =============='
     sh $script_path/restart_job.sh $env worker-upload.php false
+    echo '=========== Start worker worker-crawler =============='
+    sh $script_path/restart_job.sh $env worker-crawler.php false
 	;;
 *)
 	echo "Usage: $0 $env <start|stop>"

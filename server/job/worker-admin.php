@@ -130,7 +130,7 @@ function adxReduceFn($job)
         }
 
         \MT\Utils::writeLog('Monitor_Worker', array(
-            'worker_name' => 'server-admin.php',
+            'worker_name' => 'worker-admin.php',
             'class' => $className,
             'function' => $function
         ));

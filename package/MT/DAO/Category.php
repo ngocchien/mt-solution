@@ -13,14 +13,7 @@ class Category extends AbstractDAO
 
     public function getData($arrCondition = [])
     {
-        try {
-            return $this->executeQuery($this->__buildWhere($arrCondition));
-        } catch (\Exception $e) {
-            echo '<pre>';
-            print_r($e->getMessage());
-            echo '</pre>';
-            die();
-        }
+        return $this->get($this->__buildWhere($arrCondition));
     }
 
     private function __buildWhere($arrCondition)

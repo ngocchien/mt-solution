@@ -78,7 +78,7 @@ $adapter = $jobConfiguration['adapter'];
 $worker = \My\Job\Worker::factory($adapter, $jobConfiguration);
 
 //Add function to worker
-$worker->addFunction($jobConfiguration['function']['admin_helper'], 'adxReduceFn');
+$worker->addFunction($jobConfiguration['function']['admin_crawler'], 'adxReduceFn');
 
 $return = $worker->run();
 
@@ -92,8 +92,8 @@ function adxReduceFn($job)
 {
     global $worker, $verbose, $configuration;
 
-    $fileNameSuccess = "Worker_Helper_Action";
-    $fileNameError = "Worker_Helper_Error";
+    $fileNameSuccess = "Worker_Admin_Action";
+    $fileNameError = "Worker_Admin_Error";
     $arrData = array();
 
     //Try execute
@@ -130,7 +130,7 @@ function adxReduceFn($job)
         }
 
         \MT\Utils::writeLog('Monitor_Worker', array(
-            'worker_name' => 'worker-helper.php',
+            'worker_name' => 'worker-crawler.php',
             'class' => $className,
             'function' => $function
         ));

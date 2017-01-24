@@ -3,7 +3,7 @@ namespace MT\Search;
 
 class Content extends SearchAbstract
 {
-    const INDEX_NAME = 'news_content';
+    const INDEX_NAME = 'mt_content';
     const INDEX_TYPE = 'contentList';
 
     public function __construct()
@@ -12,27 +12,37 @@ class Content extends SearchAbstract
         $this->setSearchType(self::INDEX_TYPE);
     }
 
+    public function createIndex()
+    {
+        $checkIndex = $this->checkIndex();
+        if ($checkIndex) {
+            $this->deleteIndex();
+        }
+        $this->setColumn(self::$column_mapping);
+        $result = $this->mapping();
+        if (empty($result) || !$result['acknowledged']) {
+            return false;
+        }
+        return true;
+    }
+
     public function searchData($params = [])
     {
-        try {
-            //build params
-            $limit = empty($params['limit']) ? 20 : (int)$params['limit'];
-            $page = empty($params['page']) ? 1 : (int)$params['page'];
-            $offset = $limit * ($page - 1);
-            $sort = !empty($params['sort']) && is_array($params['sort']) ? $params['sort'] : ['cont_id' => ['order' => 'desc']];
-            $source = !empty($params['source']) && is_array($params['source']) ? $params['source'] : [];
+        //build params
+        $limit = empty($params['limit']) ? 20 : (int)$params['limit'];
+        $page = empty($params['page']) ? 1 : (int)$params['page'];
+        $offset = $limit * ($page - 1);
+        $sort = !empty($params['sort']) && is_array($params['sort']) ? $params['sort'] : ['cont_id' => ['order' => 'desc']];
+        $source = !empty($params['source']) && is_array($params['source']) ? $params['source'] : [];
 
-            //build query
-            $query = $this->__buildQuery($params);
+        //build query
+        $query = $this->__buildQuery($params);
 
-            $this->setLimit($limit)->setOffset($offset)->setSort($sort)->setSoucre($source);
-            $this->setParamsQuery($query);
+        $this->setLimit($limit)->setOffset($offset)->setSort($sort)->setSoucre($source);
+        $this->getDocument($query);
 
-            //excute
-            return $this->excuteQuery();
-        } catch (\Exception $exc) {
-            throw new Exception($exc->getMessage() . $exc->getCode());
-        }
+        //excute
+        return $this->excuteQuery();
     }
 
     public function __buildQuery($params)

@@ -26,7 +26,8 @@ return array(
                     'admin_process' => KEY_PREFIX . "admin_process_job",
                     'admin_debug' => KEY_PREFIX . "admin_debug_job",
                     'admin_upload' => KEY_PREFIX . "admin_upload_job",
-                    'admin_helper' => KEY_PREFIX . "admin_helper_job"
+                    'admin_helper' => KEY_PREFIX . "admin_helper_job",
+                    'admin_crawler' => KEY_PREFIX . "admin_crawler_job"
                 )
             )
         )
