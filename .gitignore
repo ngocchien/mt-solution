@@ -15,3 +15,4 @@ composer.phar
 #config/autoload/production/*
 #config/domain/production/*
 #config/domain/development/*
+/composer.lock
