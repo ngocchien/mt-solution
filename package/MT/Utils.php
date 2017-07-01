@@ -198,7 +198,7 @@ class Utils
                 }
             }
 
-            $log->lfile(LOG_FOLDER . '/' . date('Y') . '/' . date('m') . '/' . date('d') . '/ADX_' . $fileName);
+            $log->lfile(LOG_FOLDER . '/' . date('Y') . '/' . date('m') . '/' . date('d') . '/MT_' . $fileName);
 
             $arrParam['Time'] = date('H:i:s');
 

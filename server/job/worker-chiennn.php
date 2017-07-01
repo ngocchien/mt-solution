@@ -77,11 +77,11 @@ if ($verbose) {
     echo "ENVIRONMENT : " . APPLICATION_ENV . "\n";
 }
 
-$redis = MT\Nosql\Redis::getInstance('caching');
-echo '<pre>';
-print_r($redis->HGETALL(My\General::KEY_ACCESS_TOKEN));
-echo '</pre>';
-die();
+//$redis = MT\Nosql\Redis::getInstance('caching');
+//echo '<pre>';
+//print_r($redis->HGETALL(My\General::KEY_ACCESS_TOKEN));
+//echo '</pre>';
+//die();
 
 //MT\Utils::runJob(
 //    'info',
@@ -105,31 +105,45 @@ die();
 //[action] => cloneYoutube
 
 
+//MT\Utils::runJob(
+//    'info',
+//    'TASK\Test',
+//    'uploadYt',
+//    'doHighBackgroundTask',
+//    'admin_upload',
+//    [
+//        'title' => ' 😱💕 TRIỆU LIKE CHO ANH CHÀNG ĐÁNH TRỐNG BẰNG LON SỮA SIÊU ĐẲNG, GREATEST HE DRUMMER WITH MILK CANS',
+//        'cate_id' => 1,
+//        'path' => '/var/www/html/mt-solution/downloads/trieu-like-cho-anh-chang-danh-trong-bang-lon-sua-sieu-dang-greatest-he-drummer-with-milk-cans_FL7pSc1wSTo.mp4',
+//        'action' => __FUNCTION__,
+//        'source_id' => 'FL7pSc1wSTo'
+//    ]
+//);
+//
+//die('DONE');
+
+//MT\Utils::runJob(
+//    'info',
+//    'TASK\Test',
+//    'cloneYoutube',
+//    'doHighBackgroundTask',
+//    'admin_process',
+//    array(
+//        'actor' => __FUNCTION__
+//    )
+//);
+//
+//die('DONE');
+
 MT\Utils::runJob(
     'info',
     'TASK\Test',
-    'uploadYt',
-    'doHighBackgroundTask',
-    'admin_upload',
-    [
-        'title' => ' 😱💕 TRIỆU LIKE CHO ANH CHÀNG ĐÁNH TRỐNG BẰNG LON SỮA SIÊU ĐẲNG, GREATEST HE DRUMMER WITH MILK CANS',
-        'cate_id' => 1,
-        'path' => '/var/www/html/mt-solution/downloads/trieu-like-cho-anh-chang-danh-trong-bang-lon-sua-sieu-dang-greatest-he-drummer-with-milk-cans_FL7pSc1wSTo.mp4',
-        'action' => __FUNCTION__,
-        'source_id' => 'FL7pSc1wSTo'
-    ]
-);
-
-die('DONE');
-
-MT\Utils::runJob(
-    'info',
-    'TASK\Test',
-    'cloneYoutube',
+    'download',
     'doHighBackgroundTask',
     'admin_process',
     array(
-        'actor' => __FUNCTION__
+        'actor' => __FUNCTION__,
+        'cate_id' => 1
     )
 );
 

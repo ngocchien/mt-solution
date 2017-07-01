@@ -7,9 +7,7 @@
  */
 namespace TASK;
 
-use MT\Model,
-    My\General,
-    Zend\Dom,
+use My\General,
     MT,
     MT\Business;
 
@@ -305,6 +303,182 @@ class Test
             ]);
             echo '</pre>';
             die();
+        }
+    }
+
+    public function download($params)
+    {
+        date_default_timezone_set('Asia/Saigon');
+        $fileNameSuccess = __CLASS__ . '_' . __FUNCTION__ . '_Success';
+        $fileNameError = __CLASS__ . '_' . __FUNCTION__ . '_Error';
+        $arrParam = [];
+        $arrParam['Data'] = $params;
+        try {
+
+            if(empty($params['cate_id'])){
+                $arrParam['Error'] = 'Empty cate_id';
+                MT\Utils::writeLog($fileNameError, $arrParam);
+                return true;
+            }
+            $cate_id = $params['cate_id'];
+            $arr_channel = Business\Post::getChannel($cate_id);
+
+            if(empty($arr_channel)){
+                $arrParam['Error'] = 'Empty Channel';
+                MT\Utils::writeLog($fileNameError, $arrParam);
+                return true;
+            }
+
+            $google_config = General::$google_config;
+            $client = new \Google_Client();
+            $client->setDeveloperKey($google_config['key']);
+
+            // Define an object that will be used to make all API requests.
+            $youtube = new \Google_Service_YouTube($client);
+            $limit = 50;
+            $order = 'date';
+
+            foreach ($arr_channel as $channel_id){
+                $token_page = '';
+                for ($page = 0; $page <= 1000; $page++) {
+                    if ($page == 0) {
+                        $searchResponse = $youtube->search->listSearch(
+                            'snippet', array(
+                                'channelId' => $channel_id,
+                                'maxResults' => $limit,
+                                'order' => $order
+                            )
+                        );
+                    } else {
+                        if (empty($token_page)) {
+                            break;
+                        }
+                        $searchResponse = $youtube->search->listSearch(
+                            'snippet', array(
+                                'channelId' => $channel_id,
+                                'maxResults' => $limit,
+                                'order' => $order,
+                                'pageToken' => $token_page
+                            )
+                        );
+                    }
+
+                    if (empty($searchResponse) || empty($searchResponse->getItems())) {
+                        break;
+                    }
+
+                    $token_page = $searchResponse->getNextPageToken();
+
+                    foreach ($searchResponse->getItems() as $item) {
+
+                        if (empty($item) || empty($item->getSnippet())) {
+                            continue;
+                        }
+
+                        $id = $item->getId()->getVideoId();
+
+                        if (empty($id)) {
+                            continue;
+                        }
+
+                        //check exist
+                        $result = Business\Post::get([
+                            'source_id' => $id
+                        ]);
+
+                        if(!empty($result['rows'])){
+                            continue;
+                        }
+
+                        //title video
+                        $title = $item->getSnippet()->getTitle();
+
+                        if (!$title) {
+                            continue;
+                        }
+
+                        //get info video
+                        $url = 'http://www.youtube.com/get_video_info?&video_id=' . $id . '&asv=3&el=detailpage&hl=en_US';
+                        $rp = General::crawler($url);
+                        $thumbnail_url = $title = $url_encoded_fmt_stream_map = $type = $url = '';
+                        parse_str($rp);
+                        $my_formats_array = explode(',', $url_encoded_fmt_stream_map);
+
+                        if (empty($url_encoded_fmt_stream_map)) {
+                            continue;
+                        }
+
+                        $path = DOWNLOAD_FOLDER . '/' . General::getSlug($title) . '_' . $id . '.mp4';
+
+                        $avail_formats[] = '';
+                        $j = 0;
+                        $ipbits = $ip = $itag = $sig = $quality = '';
+                        $expire = time();
+                        foreach ($my_formats_array as $format) {
+                            parse_str($format);
+                            $avail_formats[$j]['itag'] = $itag;
+                            $avail_formats[$j]['quality'] = $quality;
+                            $type = explode(';', $type);
+                            $avail_formats[$j]['type'] = $type[0];
+                            $avail_formats[$j]['url'] = urldecode($url) . '&signature=' . $sig;
+                            parse_str(urldecode($url));
+                            $avail_formats[$j]['expires'] = date("G:i:s T", $expire);
+                            $avail_formats[$j]['ipbits'] = $ipbits;
+                            $avail_formats[$j]['ip'] = $ip;
+                            $j++;
+                        }
+
+                        $cmd = 'wget -O ' . $path.' "'. $avail_formats[0]['url'] . '"';
+                        exec($cmd);
+
+                        MT\Utils::runJob(
+                            'info',
+                            'TASK\Test',
+                            'uploadYt',
+                            'doHighBackgroundTask',
+                            'admin_upload',
+                            [
+                                'title' => $title,
+                                'cate_id' => $cate_id,
+                                'path' => $path,
+                                'action' => __FUNCTION__,
+                                'source_id' => $item->getId()->getVideoId()
+                            ]
+                        );
+                    }
+                }
+            }
+
+            sleep(60);
+            MT\Utils::runJob(
+                'info',
+                'TASK\Test',
+                'download',
+                'doHighBackgroundTask',
+                'admin_process',
+                array(
+                    'actor' => __FUNCTION__,
+                    'cate_id' => $cate_id + 1
+                )
+            );
+
+            MT\Utils::writeLog($fileNameSuccess, $arrParam);
+        } catch (\Exception $e) {
+            if(APPLICATION_ENV != 'production'){
+                echo '<pre>';
+                print_r([
+                    $e->getCode(),
+                    $e->getMessage()
+                ]);
+                echo '</pre>';
+                die();
+            }
+
+            $arrParam['exc'] = [
+                'code' => $e->getCode(),
+                'messages' => $e->getMessage()
+            ];
+            MT\Utils::writeLog($fileNameError, $arrParam);
         }
     }
 }

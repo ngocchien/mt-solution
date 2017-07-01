@@ -13,7 +13,7 @@ use MT\Business;
 
 class Post
 {
-    public static function getChannel(){
+    public static function getChannel($cate_id = ''){
         $arr_channel = [
             Business\Category::FUNNY => [
                 'UCKKZkAD3pxJ1buulcBXtZog',
@@ -78,7 +78,13 @@ class Post
 //                'UCswAeN6MrJxe3P0Ik7IK8sQ'
             ]
         ];
-
+        if(!empty($cate_id)){
+            if(!empty($arr_channel[$cate_id])){
+                return $arr_channel[$cate_id];
+            }else{
+                return [];
+            }
+        }
         return $arr_channel;
     }
 

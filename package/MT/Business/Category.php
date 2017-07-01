@@ -51,4 +51,13 @@ class Category
         }
         return $arr;
     }
+
+    public static function getListCate(){
+        return [
+            self::FUNNY,
+            self::FILM,
+            self::CARTOON,
+            self::GENERAL
+        ];
+    }
 }
