@@ -2,8 +2,8 @@
 # KhamDB
 export PATH="/usr/kerberos/sbin:/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin:"
 export APPLICATION_ENV=production
-job_path="/var/www/mt-pingpong/html/server/job"
-script_path="/var/www/mt-pingpong/html/server/scripts/production"
+job_path="/var/www/mt-solution/html/server/job"
+script_path="/var/www/mt-solution/html/server/scripts/production"
 env="$1"
 action="$2"
 processJob()

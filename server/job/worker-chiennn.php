@@ -77,6 +77,12 @@ if ($verbose) {
     echo "ENVIRONMENT : " . APPLICATION_ENV . "\n";
 }
 
+$redis = MT\Nosql\Redis::getInstance('caching');
+echo '<pre>';
+print_r($redis->HGETALL(My\General::KEY_ACCESS_TOKEN));
+echo '</pre>';
+die();
+
 //MT\Utils::runJob(
 //    'info',
 //    'TASK\Test',

@@ -1,4 +1,4 @@
 <?php
-define('SITE_URL', 'http://ping.bestquynhon.com');
-define('STATIC_URL', 'http://st.ping.bestquynhon.com');
-define('UPLOAD_URL', 'http://up.ping.bestquynhon.com');
+define('SITE_URL', 'http://mt-solution.com');
+define('STATIC_URL', 'http://static.mt-solution.com');
+define('UPLOAD_URL', 'http://upload.mt-solution.com');
