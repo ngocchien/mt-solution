@@ -110,7 +110,7 @@ if ($verbose) {
 //    'TASK\Test',
 //    'uploadYt',
 //    'doHighBackgroundTask',
-//    'admin_upload',
+//    'admin_process',
 //    [
 //        'title' => ' 😱💕 TRIỆU LIKE CHO ANH CHÀNG ĐÁNH TRỐNG BẰNG LON SỮA SIÊU ĐẲNG, GREATEST HE DRUMMER WITH MILK CANS',
 //        'cate_id' => 1,
@@ -134,6 +134,10 @@ if ($verbose) {
 //);
 //
 //die('DONE');
+
+$redis = MT\Nosql\Redis::getInstance('caching');
+$redis->SET(MT\Model\Common::KEY_TOTAL_DAILY_UPLOAD, 0);
+$redis->SET(MT\Model\Common::KEY_TOTAL_DAILY_DOWNLOAD, 0);
 
 MT\Utils::runJob(
     'info',

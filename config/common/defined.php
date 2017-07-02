@@ -3,11 +3,8 @@ define('LOG_FOLDER', ROOT_PATH . '/data/logs');
 define('KEY_PREFIX', 'mt_');
 define('PRODUCT_VERSION', 'v1');
 
-if(APPLICATION_ENV == 'production') {
-    define('DOWNLOAD_FOLDER', '/data/downloads');
-}else{
-    define('DOWNLOAD_FOLDER', ROOT_PATH.'/downloads');
-}
+define('DOWNLOAD_FOLDER', ROOT_PATH.'/downloads');
+//define('DOWNLOAD_FOLDER', '/data/downloads');
 
 if (php_sapi_name() != 'cli') {
     $protocol = strtolower(substr($_SERVER["SERVER_PROTOCOL"], 0, 5)) == 'https' ? 'https' : 'http';

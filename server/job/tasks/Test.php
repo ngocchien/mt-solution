@@ -9,7 +9,8 @@ namespace TASK;
 
 use My\General,
     MT,
-    MT\Business;
+    MT\Business,
+    MT\Model;
 
 class Test
 {
@@ -136,8 +137,6 @@ class Test
                                 ]
                             );
                         }
-
-                        die('done');
                     }
                 }
             }
@@ -171,6 +170,19 @@ class Test
             'Data' => $params
         ];
         try {
+            $redis = MT\Nosql\Redis::getInstance('caching');
+            $total_daily = $redis->GET(Model\Common::KEY_TOTAL_DAILY_UPLOAD);
+
+            if(empty($total_daily)){
+                $total_daily = 0;
+            }
+
+            if($total_daily > 1000){
+                $arrParam['ERROR'] = 'Limited';
+                MT\Utils::writeLog($fileNameError, $arrParam);
+                return true;
+            }
+
             $title = $params['title'];
             $description  = $title . Business\Category::getDescription($params['cate_id']);
             $tags = Business\Tag::getTag($params['cate_id']);
@@ -179,7 +191,9 @@ class Test
             $source_id = $params['source_id'];
 
             if(empty($path) || empty($title) || !file_exists($path) || empty($source_id)){
-                return true;
+                $arrParam['ERROR'] = 'Params input inValid';
+                MT\Utils::writeLog($fileNameError, $arrParam);
+                return false;
             }
 
             //check exist
@@ -188,11 +202,13 @@ class Test
             ]);
 
             if(!empty($result['rows'])){
-                return true;
+                $arrParam['ERROR'] = 'Files exits';
+                MT\Utils::writeLog($fileNameError, $arrParam);
+                return false;
             }
 
-            $token = self::getToken();
-            $google_config = General::$google_config;
+            $google_config = Model\Common::changeConfigApi();
+            $token = self::getToken($google_config);
             $client = new \Google_Client();
             $client->setClientId($google_config['client_id']);
             $client->setClientSecret($google_config['client_secret']);
@@ -247,14 +263,17 @@ class Test
             $client->setDefer(false);
 
             if (!empty($status['id'])) {
-                Business\Post::create([
+                $id_db = Business\Post::create([
                     'source_id' => $source_id,
                     'my_id' => $status['id'],
                     'post_title' => $title,
                     'cate_id' => $cate_id
                 ]);
+                $arrParam['ID_DB'] = $id_db;
                 @unlink($path);
             }
+
+            $redis->SET(Model\Common::KEY_TOTAL_DAILY_UPLOAD, ($total_daily+1));
 
             MT\Utils::writeLog($fileNameSuccess, $arrParam);
         } catch (\Exception $e) {
@@ -275,13 +294,16 @@ class Test
         }
     }
 
-    public static function getToken(){
+    public static function getToken($google_config){
         try{
             $redis = MT\Nosql\Redis::getInstance('caching');
             $token = $redis->HGETALL(General::KEY_ACCESS_TOKEN);
-            if(empty($token) || ($token['created']+$token['expires_in']-time() < 600)){
+
+            if(empty($token) ||
+                empty($token['key']) ||
+                $token['key'] != $token['key'] ||
+                ($token['created']+$token['expires_in']-time() < 600)){
                 //config gg
-                $google_config = General::$google_config;
                 $client = new \Google_Client();
                 $client->setClientId($google_config['client_id']);
                 $client->setClientSecret($google_config['client_secret']);
@@ -290,6 +312,7 @@ class Test
                 $client->refreshToken($google_config['refresh_token']);
                 $token = $client->getAccessToken();
                 if(!empty($token['access_token'])){
+                    $token = array_merge($token,$google_config);
                     $redis->HMSET(General::KEY_ACCESS_TOKEN, $token);
                 }
             }
@@ -337,6 +360,19 @@ class Test
             $youtube = new \Google_Service_YouTube($client);
             $limit = 50;
             $order = 'date';
+
+            $redis = MT\Nosql\Redis::getInstance('caching');
+            $total_daily = $redis->GET(Model\Common::KEY_TOTAL_DAILY_DOWNLOAD);
+
+            if(empty($total_daily)){
+                $total_daily = 0;
+            }
+
+            if($total_daily >= 1000){
+                $arrParam['Error'] = 'Full total daily';
+                MT\Utils::writeLog($fileNameSuccess, $arrParam);
+                return true;
+            }
 
             foreach ($arr_channel as $channel_id){
                 $token_page = '';
@@ -445,9 +481,19 @@ class Test
                                 'source_id' => $item->getId()->getVideoId()
                             ]
                         );
+
+                        $total_daily +=1;
+                        if($total_daily >= 1000){
+                            $arrParam['Error'] = 'Full total daily';
+                            $arrParam['LINE'] = __LINE__;
+                            MT\Utils::writeLog($fileNameSuccess, $arrParam);
+                            return true;
+                        }
                     }
                 }
             }
+
+            $redis->SET(Model\Common::KEY_TOTAL_DAILY_DOWNLOAD, $total_daily);
 
             sleep(60);
             MT\Utils::runJob(
