@@ -72,16 +72,23 @@ if ($verbose) {
 }
 
 switch ($type) {
-    case 'dk':
-        ADX\Utils::runJob(
+    case 'crontab-upload':
+        $redis = MT\Nosql\Redis::getInstance('caching');
+        $redis->SET(MT\Model\Common::KEY_TOTAL_DAILY_UPLOAD, 0);
+        $redis->SET(MT\Model\Common::KEY_TOTAL_DAILY_DOWNLOAD, 0);
+
+        MT\Utils::runJob(
             'info',
             'TASK\Test',
-            '__FUNCTION__',
+            'download',
             'doHighBackgroundTask',
             'admin_process',
-            array(//params
+            array(
+                'actor' => __FUNCTION__,
+                'cate_id' => 1
             )
         );
+
         break;
     default :
         break;

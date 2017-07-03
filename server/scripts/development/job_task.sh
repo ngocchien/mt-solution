@@ -1,7 +1,7 @@
 #!/bin/sh
 export PATH=/usr/kerberos/sbin:/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
-. /home/khamdb/v3.adx.vn/server/scripts/init_v3.adx.vn.sh
-prefix_log="/home/khamdb/v3.adx.vn/server/server/job/log"
+. /var/www/html/mt-solution/server/scripts/development/init.sh
+prefix_log="/var/www/html/mt-solution/server/job/log"
 env="development"
 case "$1" in
 1min)
@@ -32,6 +32,7 @@ day_2h)
 day_3h)
 	;;
 day_6h)
+    $php /var/www/html/mt-solution/server/job/crontab/process.php --env $env --type "crontab-upload"
 	;;
 day_9h)
 	;;

@@ -1,23 +1,27 @@
 <?php
 
-namespace Index\Controller;
+namespace Api\Controller;
 
-use MT\Search;
-use MT\Controller\MyController;
-use Zend\View\Model\JsonModel;
-use MT\Business;
+use Zend\View\Model\ViewModel;
 use MT\Model;
+use Zend\Mvc\Controller\AbstractActionController;
 
-class IndexController extends MyController
+class IndexController extends AbstractActionController
 {
     public function indexAction()
     {
         try{
             echo '<pre>';
-            print_r($this->params()->fromRoute());
+            print_r('aaaaa');
             echo '</pre>';
             die();
+            return false;
+            return new ViewModel([]);
             $google_config = Model\Common::getConfigGoogle();
+            echo '<pre>';
+            print_r($google_config);
+            echo '</pre>';
+            die();
             $google_config = $google_config[10];
             $client = new \Google_Client();
             $client->setClientId($google_config['client_id']);

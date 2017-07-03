@@ -177,7 +177,7 @@ class Test
                 $total_daily = 0;
             }
 
-            if($total_daily > 1000){
+            if($total_daily > 100){
                 $arrParam['ERROR'] = 'Limited';
                 MT\Utils::writeLog($fileNameError, $arrParam);
                 return true;
@@ -338,6 +338,19 @@ class Test
         $arrParam['Data'] = $params;
         try {
 
+            $redis = MT\Nosql\Redis::getInstance('caching');
+            $total_daily = $redis->GET(Model\Common::KEY_TOTAL_DAILY_DOWNLOAD);
+
+            if(empty($total_daily)){
+                $total_daily = 0;
+            }
+
+            if($total_daily >= 100){
+                $arrParam['Error'] = 'Full total daily';
+                MT\Utils::writeLog($fileNameSuccess, $arrParam);
+                return true;
+            }
+
             if(empty($params['cate_id'])){
                 $arrParam['Error'] = 'Empty cate_id';
                 MT\Utils::writeLog($fileNameError, $arrParam);
@@ -360,19 +373,6 @@ class Test
             $youtube = new \Google_Service_YouTube($client);
             $limit = 50;
             $order = 'date';
-
-            $redis = MT\Nosql\Redis::getInstance('caching');
-            $total_daily = $redis->GET(Model\Common::KEY_TOTAL_DAILY_DOWNLOAD);
-
-            if(empty($total_daily)){
-                $total_daily = 0;
-            }
-
-            if($total_daily >= 1000){
-                $arrParam['Error'] = 'Full total daily';
-                MT\Utils::writeLog($fileNameSuccess, $arrParam);
-                return true;
-            }
 
             foreach ($arr_channel as $channel_id){
                 $token_page = '';
@@ -483,7 +483,7 @@ class Test
                         );
 
                         $total_daily +=1;
-                        if($total_daily >= 1000){
+                        if($total_daily >= 100){
                             $arrParam['Error'] = 'Full total daily';
                             $arrParam['LINE'] = __LINE__;
                             MT\Utils::writeLog($fileNameSuccess, $arrParam);
