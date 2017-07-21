@@ -31,9 +31,12 @@ day_2h)
 day_3h)
 	;;
 day_6h)
-    $php /var/www/mt-solution/html/server/job/crontab/process.php --env $env --type "crontab-upload"
+    ##$php /var/www/mt-solution/html/server/job/crontab/process.php --env $env --type "crontab-upload"
 	;;
 day_9h)
+	;;
+day_15h)
+    $php /var/www/mt-solution/html/server/job/crontab/process.php --env $env --type "crontab-upload"
 	;;
 day_23h50)
 	;;

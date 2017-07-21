@@ -67,6 +67,14 @@ class General
     ];
 
     //ngocchien00
+    static $google_config_driver = [
+        'key' => 'AIzaSyDdESZMVy2EVOYp9bAv-ITHmp-bL8k_duY',
+        'client_id' => '169282978726-400i9lqenmcsoiffkpapo7egff3ftg2h.apps.googleusercontent.com',
+        'client_secret' => '-7BNy9BHAQhjbbdbUxY0_F9N',
+        'refresh_token' => '1/NCAoip3uBvfKdllnFGQsmoA_bhUMPMmptrjupkCxaOc'
+    ];
+
+    //ngocchien00
     static $google_config = [
         'key' => 'AIzaSyBlTq9Ah3zwzATAT0C76Fq7wVz0aE6wazM',
         'client_id' => '305277173466-i7u7cmv0a7gqco2rj86a9p99jbokp9lq.apps.googleusercontent.com',

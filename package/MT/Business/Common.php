@@ -24,7 +24,7 @@ class Common
         $token = $params['token'];
 
         $redis = Nosql\Redis::getInstance('caching');
-        $status = $redis->
+//        $status = $redis->
         $total_daily = $redis->GET(self::KEY_TOTAL_DAILY_UPLOAD);
 
         if(empty($total_daily)){

@@ -163,6 +163,7 @@ class Test
 
     public function uploadYt($params)
     {
+        sleep(60);
         date_default_timezone_set('Asia/Saigon');
         $fileNameSuccess = __CLASS__ . '_' . __FUNCTION__ . '_Success';
         $fileNameError = __CLASS__ . '_' . __FUNCTION__ . '_Success';
@@ -270,7 +271,7 @@ class Test
                     'cate_id' => $cate_id
                 ]);
                 $arrParam['ID_DB'] = $id_db;
-                @unlink($path);
+               // @unlink($path);
             }
 
             $redis->SET(Model\Common::KEY_TOTAL_DAILY_UPLOAD, ($total_daily+1));
@@ -343,6 +344,10 @@ class Test
 
             if(empty($total_daily)){
                 $total_daily = 0;
+            }
+
+            if($total_daily == 0){
+                exec('rm -rf /data/downloads');
             }
 
             if($total_daily >= 100){
