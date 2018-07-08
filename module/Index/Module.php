@@ -3,26 +3,22 @@
 namespace Index;
 
 use Zend\ModuleManager\ModuleManager;
-use Zend\Mvc\ModuleRouteListener;
-use Zend\Mvc\MvcEvent;
+use Zend\Session\SessionManager;
+use Zend\Session\Container;
 
 class Module
 {
-    public function onBootstrap(MvcEvent $e)
+    public function init(ModuleManager $mm)
     {
-        //
-        $app = $e->getApplication();
-        $sm = $app->getServiceManager();
-        $em = $app->getEventManager();
-        //
-        $listener = $sm->get('MT\Listener\Authentication');
-        //
-        $em->getSharedManager()->attach(
-            '',
-            'dispatch',
-            $listener,
-            100
-        );
+        $mm->getEventManager()->getSharedManager()->attach(__NAMESPACE__,
+            'dispatch', function ($e) {
+                $e->getTarget()->layout('index/layout');
+            });
+
+        $sessionManager = new SessionManager();
+        $sessionManager->rememberMe(SESSION_EXPIRED);
+        $sessionManager->start();
+        Container::setDefaultManager($sessionManager);
     }
 
     public function getConfig()

@@ -143,16 +143,6 @@ class Test
 
             MT\Utils::writeLog($fileNameSuccess, $arrParam);
         } catch (\Exception $e) {
-            if(APPLICATION_ENV != 'production'){
-                echo '<pre>';
-                print_r([
-                    $e->getCode(),
-                    $e->getMessage()
-                ]);
-                echo '</pre>';
-                die();
-            }
-
             $arrParam['exc'] = [
                 'code' => $e->getCode(),
                 'messages' => $e->getMessage()
@@ -278,15 +268,6 @@ class Test
 
             MT\Utils::writeLog($fileNameSuccess, $arrParam);
         } catch (\Exception $e) {
-            if(APPLICATION_ENV != 'production'){
-                echo '<pre>';
-                print_r([
-                    $e->getCode(),
-                    $e->getMessage()
-                ]);
-                echo '</pre>';
-                die();
-            }
             $arrParam = [
                 'code' => $e->getCode(),
                 'messages' => $e->getMessage()
@@ -330,7 +311,7 @@ class Test
         }
     }
 
-    public function download($params)
+    public static function download($params)
     {
         date_default_timezone_set('Asia/Saigon');
         $fileNameSuccess = __CLASS__ . '_' . __FUNCTION__ . '_Success';
@@ -530,6 +511,64 @@ class Test
                 'messages' => $e->getMessage()
             ];
             MT\Utils::writeLog($fileNameError, $arrParam);
+        }
+    }
+
+    public static function debug(){
+        try{
+            $path = '/var/www/html/mt-solution/downloads/xxxxxx.mp4';
+//            ffmpeg -i input.mp4 output.avi
+            $cmd = 'ffmpeg -i ' . $path.' /var/www/html/mt-solution/downloads/xxxxxx.mp3';
+
+            exec($cmd);
+            echo '<pre>';
+            print_r(111);
+            echo '</pre>';
+            die();
+
+            $id = 'xLYN94jkiDo';
+
+            $url = 'http://www.youtube.com/get_video_info?&video_id='.$id.'&asv=3&el=detailpage&hl=en_US';
+            $rp = General::crawler($url);
+            $thumbnail_url = $title = $url_encoded_fmt_stream_map = $type = $url = '';
+            parse_str($rp);
+            $my_formats_array = explode(',', $url_encoded_fmt_stream_map);
+
+            $avail_formats[] = '';
+            $j = 0;
+            $ipbits = $ip = $itag = $sig = $quality = '';
+            $expire = time();
+            foreach ($my_formats_array as $format) {
+                parse_str($format);
+                $avail_formats[$j]['itag'] = $itag;
+                $avail_formats[$j]['quality'] = $quality;
+                $type = explode(';', $type);
+                $avail_formats[$j]['type'] = $type[0];
+                $avail_formats[$j]['url'] = urldecode($url) . '&signature=' . $sig;
+                parse_str(urldecode($url));
+                $avail_formats[$j]['expires'] = date("G:i:s T", $expire);
+                $avail_formats[$j]['ipbits'] = $ipbits;
+                $avail_formats[$j]['ip'] = $ip;
+                $j++;
+            }
+
+            $path = DOWNLOAD_FOLDER . '/xxxxxx.mp4';
+            $cmd = 'wget -O ' . $path.' "'. $avail_formats[0]['url'] . '"';
+            exec($cmd);
+
+            echo '<pre>';
+            print_r($path);
+            echo '</pre>';
+            die();
+
+        }catch (\Exception $e){
+            echo '<pre>';
+            print_r([
+                $e->getMessage(),
+                $e->getCode()
+            ]);
+            echo '</pre>';
+            die();
         }
     }
 }

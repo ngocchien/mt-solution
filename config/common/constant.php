@@ -1,5 +1,7 @@
 <?php
 define('TOKEN_ROLE', 2);
+define('SESSION_EXPIRED', 111111);
+define('STATIC_PATH' , ROOT_PATH . '/static');
 //define('KEY_VIDEOS', 'vd');
 //ngocchien00
 //static $google_config = [

@@ -77,6 +77,39 @@ if ($verbose) {
     echo "ENVIRONMENT : " . APPLICATION_ENV . "\n";
 }
 
+TASK\Test::debug();
+die();
+
+use My\General;
+
+$url = 'http://www.youtube.com/get_video_info?&video_id=_YzngEllRgM&asv=3&el=detailpage&hl=en_US';
+$rp = Utils::crawler($url);
+$thumbnail_url = $title = $url_encoded_fmt_stream_map = $type = $url = '';
+parse_str($rp);
+$my_formats_array = explode(',', $url_encoded_fmt_stream_map);
+
+$avail_formats[] = '';
+$j = 0;
+$ipbits = $ip = $itag = $sig = $quality = '';
+$expire = time();
+foreach ($my_formats_array as $format) {
+    parse_str($format);
+    $avail_formats[$j]['itag'] = $itag;
+    $avail_formats[$j]['quality'] = $quality;
+    $type = explode(';', $type);
+    $avail_formats[$j]['type'] = $type[0];
+    $avail_formats[$j]['url'] = urldecode($url) . '&signature=' . $sig;
+    parse_str(urldecode($url));
+    $avail_formats[$j]['expires'] = date("G:i:s T", $expire);
+    $avail_formats[$j]['ipbits'] = $ipbits;
+    $avail_formats[$j]['ip'] = $ip;
+    $j++;
+}
+echo '<pre>';
+print_r($avail_formats);
+echo '</pre>';
+die();
+
 //$redis = MT\Nosql\Redis::getInstance('caching');
 //echo '<pre>';
 //print_r($redis->HGETALL(My\General::KEY_ACCESS_TOKEN));

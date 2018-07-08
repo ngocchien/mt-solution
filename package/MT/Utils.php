@@ -1318,4 +1318,142 @@ class Utils
 
         return $new_array;
     }
+
+    public static function curl($url = '', $method = '', $options = array(), $post_field = array(), $header = array())
+    {
+        try {
+            $file_name_success = 'Call_API_Action';
+            //close DB connecttion
+
+            $process_user = posix_getpwuid(posix_geteuid());
+
+            if (isset($process_user['name']) && $process_user['name'] == 'root') {
+                $file_name_success .= '_Background';
+            }else{
+                $file_name_success .= '_FE';
+            }
+            //
+            if (filter_var($url, FILTER_VALIDATE_URL) === FALSE) {
+                //write log
+                Utils::writeLog($file_name_success, array(
+                    'urlRequest' => $url,
+                    'reason' => 'Url invalid'
+                ));
+                return false;
+            }
+            $method = strtoupper($method);
+            if (!in_array($method, array('POST', 'GET', 'PUT', 'PATCH', 'DELETE'))) {
+                Utils::writeLog($file_name_success, array(
+                    'urlRequest' => $url,
+                    'reason' => 'Method invalid'
+                ));
+                return false;
+            }
+
+            $startTimer = Utils::startTimer();
+            $timeout = 20;
+            if (isset($options['timeout']) && (int)$options['timeout'] > 0) {
+                $timeout = (int)$options['timeout'];
+            }
+
+            //
+            if (!empty($post_field)) {
+                if ($method == 'GET') {
+                    $url = $url . '?' . http_build_query($post_field);
+                }
+            }
+
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+
+            if (!empty($header)) {
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+            }
+
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_TIMEOUT, $timeout); //timeout in seconds
+
+            if ($method == 'POST') {
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_field));
+            }
+
+            $output = curl_exec($ch);
+            //
+            $endTimer = Utils::endTimer($startTimer);
+
+            if ($output === false) {
+                $message = 'Warning: API Down: ' . $url;
+//                Slack::sendMessageChannel('application', $message);
+                return array();
+            }
+
+            //write log
+            Utils::writeLog($file_name_success, array(
+                'urlRequest' => $url,
+                'dataResponse' => $output,
+                'startTime' => $startTimer,
+                'endTimer' => $endTimer,
+                'method' => $method,
+                'options' => $options,
+                'post_field' => $post_field,
+                'header' => $header
+            ));
+
+            if (empty($output)) {
+                $data = [
+                    'total' => 0,
+                    'code' => 408,
+                    'message' => 'Api Timeout',
+                    'data' => []
+                ];
+            } else {
+                $data = json_decode($output, true);
+            }
+
+            return $data;
+
+        } catch (\Exception $e) {
+            throw new Exception($e->getCode(), $e->getMessage());
+        }
+    }
+
+    public static function getConfigDebugRealTime(){
+        $path_config_debug = SERVER_PATH. '/job/config/'.APPLICATION_ENV.'/config-debug.php';
+        if(!file_exists($path_config_debug)){
+            return [];
+        }
+        $config = new \Zend\Config\Config(include $path_config_debug);
+        $config = $config->toArray();
+        return $config;
+    }
+
+    public static function getConfigFromFile($path_file){
+
+        if(!file_exists($path_file)){
+            return [];
+        }
+
+        $path_info = pathinfo($path_file);
+        switch ($path_info['extension']){
+            case 'json':
+                $reader = new \Zend\Config\Reader\Json();
+                $config = (array)$reader->fromFile($path_file);
+                break;
+            case 'php' :
+                $config = new \Zend\Config\Config(include $path_file);
+                $config = $config->toArray();
+                break;
+            default :
+                $config = [];
+                break;
+        }
+        unset($path_info);
+
+        return $config;
+    }
 }

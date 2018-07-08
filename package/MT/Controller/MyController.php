@@ -4,6 +4,7 @@ namespace MT\Controller;
 
 use Zend\Mvc\MvcEvent,
     Zend\Mvc\Controller\AbstractActionController,
+    Zend\View\Renderer\PhpRenderer,
     My\General,
     MT\StaticManager;
 
@@ -16,7 +17,7 @@ class MyController extends AbstractActionController
     protected $params;
     protected $serverUrl;
     private $resource;
-    private $renderer;
+    protected $renderer;
 
     /*
      *@params array $params
@@ -72,7 +73,8 @@ class MyController extends AbstractActionController
                 'action' => strtolower($params['action'])
             ]);
             $this->setResource($this->params['module'] . ':' . $this->params['controller'] . ':' . $this->params['action']);
-            $this->setRenderer($this->serviceLocator->get('Zend\View\Renderer\PhpRenderer'));
+//            $this->renderer = new PhpRenderer();
+            $this->renderer = $this->serviceLocator->get('Zend\View\Renderer\PhpRenderer');
             $auth = $this->authenticate();
 
             if ($this->params['module'] === 'admin' && !$auth) {
@@ -85,14 +87,14 @@ class MyController extends AbstractActionController
                 }
             }
 
-            $instanceStaticManager = new StaticManager\StaticManager($this->resource, $this->serviceLocator);
-            $instanceStaticManager
-                ->setJS(array('defaultJS' => $this->defaultJS))
-                ->setJS(array('externalJS' => $this->externalJS))
-                ->setCSS(array('defaultCSS' => $this->defaultCSS))
-                ->setCSS(array('externalCSS' => $this->externalCSS))
-                ->render(2.1);
-            $this->setMeta($this->params);
+//            $instanceStaticManager = new StaticManager\StaticManager($this->resource, $this->serviceLocator);
+//            $instanceStaticManager
+//                ->setJS(array('defaultJS' => $this->defaultJS))
+//                ->setJS(array('externalJS' => $this->externalJS))
+//                ->setCSS(array('defaultCSS' => $this->defaultCSS))
+//                ->setCSS(array('externalCSS' => $this->externalCSS))
+//                ->render(2.1);
+//            $this->setMeta($this->params);
         }
         return parent::onDispatch($e);
     }

@@ -33,48 +33,7 @@ return [
                     ],
                 ],
             ],
-//            'post' => [
-//                'type'    => Segment::class,
-//                'options' => [
-//                    'route'    => '/bai-viet[/:name]/',
-//                    'constraints' => array(
-//                        'name' => '[a-zA-Z0-9_-]*'
-//                    ),
-//                    'defaults' => [
-//                        'module' => 'Index',
-//                        'controller'    => 'Application\Controller\Product',
-//                        'action'        => 'index',
-//                    ],
-//                ],
-//            ],
-//            'news' => [
-//                'type'    => Segment::class,
-//                'options' => [
-//                    'route'    => '/tin-tuc[/:name]/',
-//                    'constraints' => array(
-//                        'name' => '[a-zA-Z0-9_-]*'
-//                    ),
-//                    'defaults' => [
-//                        'controller'    => 'Application\Controller\News',
-//                        'action'        => 'index',
-//                    ],
-//                ],
-//            ],
-//            'category' => [
-//                'type'    => Segment::class,
-//                'options' => [
-//                    'route'    => '/the-loai[/:name]/',
-//                    'constraints' => array(
-//                        'name' => '[a-zA-Z0-9_-]*'
-//                    ),
-//                    'defaults' => [
-//                        'module' => 'Application',
-//                        'controller'    => 'Application\Controller\Category',
-//                        'action'        => 'index',
-//                    ],
-//                ],
-//            ],
-        ],
+        ]
     ],
     'controllers' => [
         'invokables' => array(
@@ -91,13 +50,10 @@ return [
         'not_found_template'       => 'error/404',
         'exception_template'       => 'error/index',
         'template_map' => [
-            'index/layout'    => __DIR__ . '/../view/layout/layout.phtml',
-            'index/header'      => __DIR__ . '/../view/layout/header.phtml',
-            'index/footer'      => __DIR__ . '/../view/layout/footer.phtml',
-            'index/left-menu'      => __DIR__ . '/../view/layout/left-menu.phtml',
+            'index/layout'    => __DIR__ . '/../view/layout/layout.phtml'
         ],
         'template_path_stack' => [
-            'application' => __DIR__ . '/../view'
+            'index' => __DIR__ . '/../view'
         ],
         'strategies' => array(
             'ViewJsonStrategy',

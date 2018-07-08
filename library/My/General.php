@@ -54,11 +54,18 @@ class General
         'cyan' => '46', 'light_gray' => '47',
     );
 
+//    static $config_fb = array(
+//        'appId' => '654662148043081',
+//        'secret' => '023f46f87634523c8dda5fbcbe4e3638',
+//        'fb_id' => 158207711302448,
+//        'access_token' => 'EAAJTaWjIMUkBAPzPyrhRFR85wEM6BRAxZCgaiwwkvuuZCRDTdoUvlusOj0a1KOZB4xJ6ZBMtig6F8TMQ8VWhXG6W8pGwZBUhyR6vB0Bp9P5wyIpnlfsF90XoXtXEqkHRlEZC8NdF2xEXHysoOZACEhAcv62Ei4nMxAZD'
+//    );
+
     static $config_fb = array(
-        'appId' => '654662148043081',
-        'secret' => '023f46f87634523c8dda5fbcbe4e3638',
-        'fb_id' => 158207711302448,
-        'access_token' => 'EAAJTaWjIMUkBAPzPyrhRFR85wEM6BRAxZCgaiwwkvuuZCRDTdoUvlusOj0a1KOZB4xJ6ZBMtig6F8TMQ8VWhXG6W8pGwZBUhyR6vB0Bp9P5wyIpnlfsF90XoXtXEqkHRlEZC8NdF2xEXHysoOZACEhAcv62Ei4nMxAZD'
+//        'appId' => '654662148043081',
+        'app_secret' => 'bba69c2d66027a074ad785d4500b554a',
+        'app_id' => 117415252259106,
+        'access_token' => 'EAABqyd5m8SIBACC7XLRuNrOTbNdHZCN6RhvKzRS5QUxGhDn43tRyfZB3anRPmrVSjqw1ziADTgz3OuX9O1h5J7JXyMq4enKNh7WzgXQvYc6zdutwqcl6FuKMNYufvWe66eJr1ZCIOfHS75sgDshbhZA6sbb3cGrgp2uOldsmQGZAKhCjQrF1sxL2MR7gNLMakg9XHulC8WfnB039UQ7ZA8givuPBRgZAKq6PSbd5wbnqAZDZD'
     );
 
     static $face_traffic = [

@@ -61,7 +61,7 @@ return [
         'not_found_template'       => 'error/404',
         'exception_template'       => 'error/index',
         'template_map' => [
-            'index/layout'    => __DIR__ . '/../view/layout/layout.phtml',
+            'api/layout'    => __DIR__ . '/../view/layout/layout.phtml',
         ],
         'template_path_stack' => [
             'application' => __DIR__ . '/../view'
